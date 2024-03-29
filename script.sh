@@ -91,13 +91,19 @@ else
 fi
 
 echo '::group:: Running rubocop with reviewdog 🐶 ...'
+
+# if INPUT_FAIL_ON_ERROR is true, append -fail-on-error to INPUT_REVIEWDOG_FLAGS
+# since review ignores -fail-on-error=false
+if [ "${INPUT_FAIL_ON_ERROR}" = "true" ]; then
+  INPUT_REVIEWDOG_FLAGS="${INPUT_REVIEWDOG_FLAGS} -fail-on-error"
+fi
+
 # shellcheck disable=SC2086
 ${BUNDLE_EXEC}rubocop ${INPUT_RUBOCOP_FLAGS} --require ${GITHUB_ACTION_PATH}/rdjson_formatter/rdjson_formatter.rb --format RdjsonFormatter \
   | reviewdog -f=rdjson \
       -name="${INPUT_TOOL_NAME}" \
       -reporter="${INPUT_REPORTER}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
-      -fail-on-error="${INPUT_FAIL_ON_ERROR}" \
       -level="${INPUT_LEVEL}" \
       ${INPUT_REVIEWDOG_FLAGS}
 
