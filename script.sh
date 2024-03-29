@@ -90,6 +90,8 @@ else
   BUNDLE_EXEC="bundle exec "
 fi
 
+set -v
+set -x
 echo '::group:: Running rubocop with reviewdog 🐶 ...'
 
 # if INPUT_FAIL_ON_ERROR is true, append -fail-on-error to INPUT_REVIEWDOG_FLAGS
@@ -101,6 +103,7 @@ fi
 # shellcheck disable=SC2086
 ${BUNDLE_EXEC}rubocop ${INPUT_RUBOCOP_FLAGS} --require ${GITHUB_ACTION_PATH}/rdjson_formatter/rdjson_formatter.rb --format RdjsonFormatter \
   | reviewdog -f=rdjson \
+      -tee \
       -name="${INPUT_TOOL_NAME}" \
       -reporter="${INPUT_REPORTER}" \
       -filter-mode="${INPUT_FILTER_MODE}" \
@@ -108,5 +111,6 @@ ${BUNDLE_EXEC}rubocop ${INPUT_RUBOCOP_FLAGS} --require ${GITHUB_ACTION_PATH}/rdj
       ${INPUT_REVIEWDOG_FLAGS}
 
 reviewdog_rc=$?
+echo "reviewdog_rc: $reviewdog_rc"
 echo '::endgroup::'
 exit $reviewdog_rc
